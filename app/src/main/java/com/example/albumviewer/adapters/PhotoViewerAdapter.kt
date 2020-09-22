@@ -8,14 +8,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.albumviewer.R
-import com.example.albumviewer.activities.AlbumActivity
+import com.example.albumviewer.activities.PhotoActivity
 import com.example.albumviewer.model.Photo
 import com.squareup.picasso.Picasso
 
-class PhotoViewerAdapter(private val list: List<Photo>) :
+class PhotoViewerAdapter(private val list: List<Photo?>?) :
     RecyclerView.Adapter<PhotoViewerAdapter.MyViewHolder>(), View.OnClickListener {
 
-    private var activity: AlbumActivity? = null
+    private var activity: PhotoActivity? = null
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var title: TextView? = null
@@ -26,15 +26,15 @@ class PhotoViewerAdapter(private val list: List<Photo>) :
         }
     }
 
-    fun setOnItemViewClickListener(activity: AlbumActivity) {
-
+    fun setOnItemViewClickListener(activity: PhotoActivity) {
+        this.activity = activity
     }
 
     @SuppressLint("ResourceType")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val itemView =
             LayoutInflater.from(parent.context)
-                .inflate(R.layout.photo_item_view, parent, false);
+                .inflate(R.layout.photo_item_view, parent, false)
         itemView.setOnClickListener(this)
         return MyViewHolder(
             itemView
@@ -42,37 +42,23 @@ class PhotoViewerAdapter(private val list: List<Photo>) :
     }
 
     override fun getItemCount(): Int {
-        return list.size
+        return list!!.size
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.title?.text = list[position].title
-//        MyApplication.getInstance()!!.getImageLoader()!!.get(list[position].thumbnailUrl, object :ImageLoader.ImageListener{
-//            override fun onResponse(response: ImageLoader.ImageContainer?, isImmediate: Boolean) {
-//               holder.image!!.setImageBitmap(response!!.bitmap)
-//            }
-//
-//            override fun onErrorResponse(error: VolleyError?) {
-//                Log.d("kapil", "error")
-//                holder.image!!.setImageResource(android.R.drawable.stat_notify_error)
-//            }
-//
-//        })
-
-        //val imageLoader = MyApplication.getInstance()!!.getImageLoader()
-        //holder.image!!.setImageUrl(list[position].thumbnailUrl, imageLoader)
+        holder.title?.text = list?.get(position)!!.title
         Picasso.get()
-            .load(list[position].thumbnailUrl)
+            .load(list[position]!!.thumbnailUrl)
             .placeholder(R.drawable.ic_launcher_background)
             .error(android.R.drawable.stat_notify_error)
-            .into(holder.image);
+            .into(holder.image)
     }
 
     override fun onClick(view: View?) {
-        //activity!!.onItemViewClick();
+        activity!!.onItemViewClick(view)
     }
 
     interface OnItemViewClickListener {
-        fun onItemViewClick();
+        fun onItemViewClick(view: View?)
     }
 }
